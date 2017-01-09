@@ -39,7 +39,7 @@ namespace graphics
 			ID3D11Device*			pDevice;
 			ID3D11DeviceContext*	pDeviceContext;
 
-			// デバイスを作成する
+			// デバイスを作成
 			for (const auto& driverType : driverTypes)
 			{
 				hr = D3D11CreateDevice(
@@ -77,29 +77,10 @@ namespace graphics
 				throw exeption;
 			}
 
-			// ディファードコンテキスト作成
-			ID3D11DeviceContext* pDeferredContext;
-
-			hr = pDevice_->CreateDeferredContext(0, &pDeferredContext);
-
-			try
-			{
-				if (FAILED(hr))
-				{
-					throw utility::Exeption("GraphicDviceD3D11", "GraphicDviceD3D11", "failed pDevice_->CreateDeferredContext");
-				}
-			}
-			catch (utility::Exeption exeption)
-			{
-				throw exeption;
-			}
-
-			pDeferredContext_ = std::shared_ptr<ID3D11DeviceContext>(pDeferredContext, utility::ComDeleter());
-
 			//DXGI初期化
-			IDXGIDevice1* pDXGIDevice	= NULL;
-			IDXGIAdapter* pDXGIAdapter	= NULL;
-			IDXGIFactory* pDXGIFactory	= NULL;
+			IDXGIDevice1* pDXGIDevice	= nullptr;
+			IDXGIAdapter* pDXGIAdapter	= nullptr;
+			IDXGIFactory* pDXGIFactory	= nullptr;
 
 			pDevice_->QueryInterface(__uuidof(IDXGIDevice1), (void**)&pDXGIDevice);
 			pDXGIDevice->GetAdapter(&pDXGIAdapter);
@@ -125,7 +106,7 @@ namespace graphics
 			}
 		}	// GraphicDeviceD3D11
 
-		IDXGISwapChain* GraphicDeviceD3D11::CreateDXGISwapChain(
+		IDXGISwapChain* GraphicDeviceD3D11::CreateIDXGISwapChain(
 			HWND _hWnd,
 			bool _isWindowMode)
 		{
@@ -175,7 +156,7 @@ namespace graphics
 			return pDXGISwapChain;
 		}
 
-		ID3D11RenderTargetView* GraphicDeviceD3D11::CreateD3D11RenderTargetView(
+		ID3D11RenderTargetView* GraphicDeviceD3D11::CreateID3D11RenderTargetView(
 			IDXGISwapChain& _swapChain)
 		{
 			HRESULT hr = S_OK;
@@ -220,7 +201,74 @@ namespace graphics
 			return pRenderTargetView;
 		}
 
-		ID3D11VertexShader* GraphicDeviceD3D11::CreateD3D11VertexShader(const std::string& _csoPath)
+		ID3D11Texture2D * GraphicDeviceD3D11::CreateID3D11Texture2D(
+			UINT							_width, 
+			UINT							_height, 
+			DXGI_FORMAT						_dxgiFormat, 
+			UINT							_count, 
+			UINT							_quality, 
+			UINT							_bindFlags, 
+			UINT							_mipmapLevels,
+			D3D11_USAGE						_usage,
+			UINT							_cpuAccessFlags, 
+			UINT							_miscFlags,
+			const D3D11_SUBRESOURCE_DATA*	_pInitialData)
+		{
+			ID3D11Texture2D* pID3D11Texture2D;
+
+			//pDevice_->CreateTexture2D()
+
+			D3D11_TEXTURE2D_DESC d3d11Texture2dDesc;
+
+			ZeroMemory(&d3d11Texture2dDesc, sizeof(d3d11Texture2dDesc));
+
+			d3d11Texture2dDesc.Width				= _width;
+			d3d11Texture2dDesc.Height				= _height;
+			d3d11Texture2dDesc.MipLevels			= _mipmapLevels;
+			d3d11Texture2dDesc.ArraySize			= 1;
+			d3d11Texture2dDesc.Format				= _dxgiFormat;
+			d3d11Texture2dDesc.SampleDesc.Count		= _count;
+			d3d11Texture2dDesc.SampleDesc.Quality	= _quality;
+			d3d11Texture2dDesc.Usage				= _usage;
+			d3d11Texture2dDesc.BindFlags			= _bindFlags;
+			d3d11Texture2dDesc.CPUAccessFlags		= _cpuAccessFlags;
+			d3d11Texture2dDesc.MiscFlags			= _miscFlags;
+
+			auto hr = pDevice_->CreateTexture2D(&d3d11Texture2dDesc, _pInitialData, &pID3D11Texture2D);
+
+			if (FAILED(hr))
+			{
+				throw std::runtime_error("Failed to CreateTexture2D");
+			}
+
+			return pID3D11Texture2D;
+		}
+
+		ID3D11DepthStencilView* GraphicDeviceD3D11::CreateID3D11DepthStencilView(DXGI_FORMAT _dxgiFormat, D3D11_DSV_DIMENSION _d3d11DSVdimension, ID3D11Resource* _pResource)
+		{
+			ID3D11DepthStencilView* pID3D11DepthStencilView = nullptr;
+
+			D3D11_DEPTH_STENCIL_VIEW_DESC d3d11DepthStencilViewDesc;
+
+			ZeroMemory(&d3d11DepthStencilViewDesc, sizeof(d3d11DepthStencilViewDesc));
+
+			d3d11DepthStencilViewDesc.Format		= _dxgiFormat;
+			d3d11DepthStencilViewDesc.ViewDimension = _d3d11DSVdimension;
+
+			if (_d3d11DSVdimension == D3D11_DSV_DIMENSION_TEXTURE2D)
+				d3d11DepthStencilViewDesc.Texture2D.MipSlice = 0;
+
+			auto hr = pDevice_->CreateDepthStencilView(_pResource, &d3d11DepthStencilViewDesc, &pID3D11DepthStencilView);
+
+			if (FAILED(hr))
+			{
+				throw std::runtime_error("Failed to CreateDepthStencilView");
+			}
+
+			return pID3D11DepthStencilView;
+		}
+
+		ID3D11VertexShader* GraphicDeviceD3D11::CreateID3D11VertexShader(const std::string& _csoPath)
 		{
 			auto				pShaderBinaryCode	= graphics::shadercompiler::LoadFromCSO(_csoPath);
 			ID3D11VertexShader* pVertexShader		= nullptr;
@@ -246,7 +294,7 @@ namespace graphics
 			return pVertexShader;
 		}
 
-		ID3D11VertexShader* GraphicDeviceD3D11::CreateD3D11VertexShader(const ShaderBinaryCode& _shaderBinaryCode)
+		ID3D11VertexShader* GraphicDeviceD3D11::CreateID3D11VertexShader(const ShaderBinaryCode& _shaderBinaryCode)
 		{
 			ID3D11VertexShader* pVertexShader = nullptr;
 
@@ -271,7 +319,7 @@ namespace graphics
 			return pVertexShader;
 		}
 
-		ID3D11PixelShader* GraphicDeviceD3D11::CreateD3D11PixelShader(const std::string& _csoPath)
+		ID3D11PixelShader* GraphicDeviceD3D11::CreateID3D11PixelShader(const std::string& _csoPath)
 		{
 			auto				pShaderBinaryCode = graphics::shadercompiler::LoadFromCSO(_csoPath);
 			ID3D11PixelShader*	pPixelShader = nullptr;
@@ -297,42 +345,42 @@ namespace graphics
 			return pPixelShader;
 		}
 
-		inline ID3D11Device * GraphicDeviceD3D11::GetDevice() const
+		ID3D11Device * GraphicDeviceD3D11::GetDevice() const
 		{
 			return pDevice_.get();
 		}
 
-		inline std::weak_ptr<ID3D11Device> GraphicDeviceD3D11::GetDeviceWeak() const
+		std::weak_ptr<ID3D11Device> GraphicDeviceD3D11::GetDeviceWeak() const
 		{
 			return pDevice_;
 		}
 
-		inline std::shared_ptr<ID3D11Device> GraphicDeviceD3D11::GetDeviceShared() const
+		std::shared_ptr<ID3D11Device> GraphicDeviceD3D11::GetDeviceShared() const
 		{
 			return pDevice_;
 		}
 
-		inline ID3D11DeviceContext * GraphicDeviceD3D11::GetDeviceContext() const
+		ID3D11DeviceContext * GraphicDeviceD3D11::GetDeviceContext() const
 		{
 			return pDeviceContext_.get();
 		}
 
-		inline std::weak_ptr<ID3D11DeviceContext> GraphicDeviceD3D11::GetDeviceContextWeak() const
+		std::weak_ptr<ID3D11DeviceContext> GraphicDeviceD3D11::GetDeviceContextWeak() const
 		{
 			return pDeviceContext_;
 		}
 
-		inline std::shared_ptr<ID3D11DeviceContext> GraphicDeviceD3D11::GetDeviceContextShared() const
+		std::shared_ptr<ID3D11DeviceContext> GraphicDeviceD3D11::GetDeviceContextShared() const
 		{
 			return pDeviceContext_;
 		}
 
-		inline IDXGIDevice1 * GraphicDeviceD3D11::GetDXGIDevice() const
+		IDXGIDevice1 * GraphicDeviceD3D11::GetDXGIDevice() const
 		{
 			return pDXGIDevice_.get();
 		}
 
-		inline IDXGIAdapter * GraphicDeviceD3D11::GetDXGIAdapter() const
+		IDXGIAdapter * GraphicDeviceD3D11::GetDXGIAdapter() const
 		{
 			return pDXGIAdapter_.get();
 		}

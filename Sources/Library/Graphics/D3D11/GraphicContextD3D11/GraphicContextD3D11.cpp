@@ -11,9 +11,9 @@ namespace graphics
 			
 		}
 
-		void GraphicContextD3D11::SetRenderTarget(ID3D11RenderTargetView* _renderTarget)
+		void GraphicContextD3D11::SetRenderTarget(unsigned int _numViews,ID3D11RenderTargetView* _pID3D11RenderTargetView, ID3D11DepthStencilView* _pID3D11DepthStencilView)
 		{
-			pDeviceContext_->OMSetRenderTargets(1, &_renderTarget, nullptr);
+			pDeviceContext_->OMSetRenderTargets(_numViews, &_pID3D11RenderTargetView, _pID3D11DepthStencilView);
 		}
 
 		//void GraphicContextD3D11::SetShader(ShaderD3D11& _shader)
@@ -43,6 +43,16 @@ namespace graphics
 			vp.TopLeftY = 0;
 
 			pDeviceContext_->RSSetViewports(1, &vp);
+		}
+
+		void GraphicContextD3D11::SetInputLayout(ID3D11InputLayout * pInputLayout)
+		{
+			pDeviceContext_->IASetInputLayout(pInputLayout);
+		}
+
+		ID3D11DeviceContext * GraphicContextD3D11::GetID3D11DeviceContext()
+		{
+			return pDeviceContext_.get();
 		}
 
 	}	// d3d11

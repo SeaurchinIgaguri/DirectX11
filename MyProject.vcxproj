@@ -26,7 +26,7 @@
     <ClInclude Include="Sources\Library\Graphics\ShaderBinaryCode.h" />
     <ClInclude Include="Sources\Library\Graphics\ShaderCompiler\ShaderCompilerHLSL\ShaderCompilerHLSL.h" />
     <ClInclude Include="Sources\Library\Graphics\GraphicDevice\IGraphicDevice.h" />
-    <ClInclude Include="Sources\Library\Graphics\UsingGraphics.h" />
+    <ClInclude Include="Sources\Library\Graphics\UsingGraphics\UsingGraphics.h" />
     <ClInclude Include="Sources\Library\Utility\COMPointer.h" />
     <ClInclude Include="Sources\Library\Utility\NonCopyable.h" />
     <ClInclude Include="Sources\TestApplication\D3D11Window\D3D11Window.h" />

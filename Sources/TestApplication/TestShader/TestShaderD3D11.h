@@ -14,11 +14,8 @@ namespace d3d11application
 		{
 			auto pShaderBinaryCode = graphics::shadercompiler::LoadFromCSO("Resources/Shader/VertexShader.cso");
 
-			ID3D11VertexShader*		pVertexShader	= _graphicDevice.CreateD3D11VertexShader(*pShaderBinaryCode.get());
-			ID3D11PixelShader*		pPixelShader	= _graphicDevice.CreateD3D11PixelShader("Resources/Shader/PixelShader.cso");
-
-			pVertexShader_.reset(pVertexShader);
-			pPixelShader_.reset(pPixelShader);
+			pVertexShader_	= utility::make_com_unique(_graphicDevice.CreateID3D11VertexShader(*pShaderBinaryCode.get()));
+			pPixelShader_	= utility::make_com_unique(_graphicDevice.CreateID3D11PixelShader("Resources/Shader/PixelShader.cso"));
 
 			ID3D11InputLayout* pInputLayout = nullptr;
 
@@ -42,6 +39,7 @@ namespace d3d11application
 
 		void Begin(graphics::d3d11::GraphicContextD3D11& _graphicContext)
 		{
+			_graphicContext.SetInputLayout(pInputLayout_.get());
 			_graphicContext.SetShader(pVertexShader_.get());
 			_graphicContext.SetShader(pPixelShader_.get());
 		}

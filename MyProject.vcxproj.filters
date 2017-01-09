@@ -101,7 +101,7 @@
     <ClInclude Include="Sources\TestApplication\TestShader\TestShaderD3D11.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Library\Graphics\UsingGraphics.h">
+    <ClInclude Include="Sources\Library\Graphics\UsingGraphics\UsingGraphics.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

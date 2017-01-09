@@ -40,7 +40,7 @@ namespace graphics
 			@param[in]	pRenderTarget			設定するレンダーターゲットへのポインタ
 			@date		2016/08/20 作成
 			------------------------------------------------------------------------*/
-			void SetRenderTarget(ID3D11RenderTargetView* pRenderTarget);
+			void SetRenderTarget(unsigned int _numViews, ID3D11RenderTargetView * _pID3D11RenderTargetView, ID3D11DepthStencilView * _pID3D11DepthStencilView);
 
 			//void SetShader(ShaderD3D11& shader);
 
@@ -67,6 +67,14 @@ namespace graphics
 			@date		2016/08/20 作成
 			------------------------------------------------------------------------*/
 			void SetViewport(float width, float height, float minDepth, float maxDepth);
+
+			/*!-----------------------------------------------------------------------
+			@brief		インプットレイアウトを設定
+			@param[in]	pInputLayout			設定するインプットレイアウトへのポインタ
+			------------------------------------------------------------------------*/
+			void SetInputLayout(ID3D11InputLayout* pInputLayout);
+
+			ID3D11DeviceContext* GetID3D11DeviceContext();
 
 			/*------------------------------------------------------------------------
 			//メンバ変数

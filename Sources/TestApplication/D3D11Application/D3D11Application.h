@@ -13,6 +13,7 @@
 #include "../../Library/Graphics/D3D11/GraphicDeviceD3D11/GraphicDeviceD3D11.h"
 #include "../../Library/Graphics/D3D11/GraphicContextD3D11/GraphicContextD3D11.h"
 #include "../TestShader/TestShaderD3D11.h"
+#include "../../Library/Graphics/D3D11/BufferD3D11/BufferD3D11.h"
 
 namespace d3d11application
 {
@@ -24,19 +25,31 @@ namespace d3d11application
 	class D3D11Application
 		: public application::win32::ApplicationWin32
 	{
+	private:
+
+		struct TestVertex 
+		{
+			float x, y, z;
+		};
+
 		/*------------------------------------------------------------------------
 		//ÉÅÉìÉoïœêî
 		------------------------------------------------------------------------*/
 	private:
-		D3D11Window d3d11window_;
+		application::WindowSetting d3d11WindowSetting;
+
+		D3D11Window d3d11Window_;
 
 		graphics::d3d11::GraphicDeviceD3D11		graphicDevice_;
 		graphics::d3d11::GraphicContextD3D11	graphicContext_;
 
 		utility::com_unique_ptr<IDXGISwapChain>			pSwapChain_;
-		utility::com_unique_ptr<ID3D11RenderTargetView> pRenderTarget_;
+		utility::com_unique_ptr<ID3D11RenderTargetView> pRenderTargetView_;
+		utility::com_unique_ptr<ID3D11Texture2D>		pDepthStencilTexture_;
+		utility::com_unique_ptr<ID3D11DepthStencilView> pDepthStencilView_;
 
-		TestShaderD3D11 testShader_;
+		TestShaderD3D11					testShader_;
+		//graphics::d3d11::BufferD3D11	testVertices_;
 
 		/*------------------------------------------------------------------------
 		//publicÉÅÉìÉoä÷êî

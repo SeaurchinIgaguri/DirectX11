@@ -54,13 +54,13 @@ namespace graphics
 			subresourceData.SysMemPitch			= 0;
 			subresourceData.SysMemSlicePitch	= 0;
 
-			auto initialData = (_sourceData != nullptr) ? &subresourceData : nullptr;
+			auto pInitialData = (_sourceData != nullptr) ? &subresourceData : nullptr;
 
 			ID3D11Buffer* pBuffer = nullptr;
 
 			try
 			{
-				HRESULT hr = _pDevice->CreateBuffer(&bufferDesc, &subresourceData, &pBuffer);
+				HRESULT hr = _pDevice->CreateBuffer(&bufferDesc, pInitialData, &pBuffer);
 
 				if (FAILED(hr))
 				{

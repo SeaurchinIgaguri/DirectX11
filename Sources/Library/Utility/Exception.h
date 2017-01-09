@@ -13,8 +13,8 @@ namespace utility
 		std::string		methodName;		//!< 例外が起こった関数名
 		std::string		overview;		//!< 例外の概要
 
-		const char*		fileName;		//!< 例外が起こったファイル名
-		int				line;			//!< 例外が起こった行
+		//const char*		fileName;		//!< 例外が起こったファイル名
+		//int				line;			//!< 例外が起こった行
 
 		Exeption()
 		{
@@ -33,6 +33,18 @@ namespace utility
 			className	= _className;
 			methodName	= _methodName;
 			overview	= _overview;
+		}
+
+		Exeption(
+			std::exception _exeption,
+			std::string _className,
+			std::string _methodName,
+			std::string _overview)
+		{
+			exception = _exeption;
+			className = _className;
+			methodName = _methodName;
+			overview = _overview;
 		}
 	};
 
