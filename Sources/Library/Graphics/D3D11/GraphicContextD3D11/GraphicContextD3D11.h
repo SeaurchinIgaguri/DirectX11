@@ -44,6 +44,8 @@ namespace graphics
 
 			//void SetShader(ShaderD3D11& shader);
 
+			void ClearShaders();
+
 			/*!-----------------------------------------------------------------------
 			@brief		頂点シェーダーを設定
 			@param[in]	pVertexShader			設定する頂点シェーダへのポインタ

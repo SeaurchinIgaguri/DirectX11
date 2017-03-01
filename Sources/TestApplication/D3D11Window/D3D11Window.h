@@ -46,7 +46,24 @@ namespace d3d11application
 		@exeption	例外の説明
 		@date		作成/更新した日付
 		------------------------------------------------------------------------*/
+		LRESULT WindowProcedur(
+			HWND	_hWnd,
+			UINT	_message,
+			WPARAM	_wParam,
+			LPARAM	_lParam) override
+		{
+			switch (_message)
+			{
+			case WM_DESTROY:
+				PostQuitMessage(0);
+				break;
+				
+			default:
+				break;
+			}
 
+			return DefWindowProc(_hWnd, _message, _wParam, _lParam);
+		}
 
 		/*------------------------------------------------------------------------
 		//privateメンバ関数

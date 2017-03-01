@@ -21,6 +21,16 @@ namespace graphics
 		//	//_shader.Begin(*this);
 		//}
 
+		void GraphicContextD3D11::ClearShaders()
+		{
+			pDeviceContext_->VSSetShader(nullptr, nullptr, 0);
+			pDeviceContext_->PSSetShader(nullptr, nullptr, 0);
+			pDeviceContext_->HSSetShader(nullptr, nullptr, 0);
+			pDeviceContext_->DSSetShader(nullptr, nullptr, 0);
+			pDeviceContext_->GSSetShader(nullptr, nullptr, 0);
+			pDeviceContext_->CSSetShader(nullptr, nullptr, 0);
+		}
+
 		void GraphicContextD3D11::SetShader(ID3D11VertexShader* _pVertexShader)
 		{
 			pDeviceContext_->VSSetShader(_pVertexShader, nullptr, 0);

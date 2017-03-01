@@ -43,13 +43,11 @@ namespace d3d11application
 		graphics::d3d11::GraphicDeviceD3D11		graphicDevice_;
 		graphics::d3d11::GraphicContextD3D11	graphicContext_;
 
-		utility::com_unique_ptr<IDXGISwapChain>			pSwapChain_;
-		utility::com_unique_ptr<ID3D11RenderTargetView> pRenderTargetView_;
-		utility::com_unique_ptr<ID3D11Texture2D>		pDepthStencilTexture_;
-		utility::com_unique_ptr<ID3D11DepthStencilView> pDepthStencilView_;
+		utility::com_unique_ptr<IDXGISwapChain>				pSwapChain_;
+		utility::com_unique_ptr<ID3D11RenderTargetView>		pRenderTargetView_;
 
-		TestShaderD3D11					testShader_;
-		//graphics::d3d11::BufferD3D11	testVertices_;
+		TestShaderD3D11									testShader_;
+		std::unique_ptr<graphics::d3d11::BufferD3D11>	pTestVertexBuffer;
 
 		/*------------------------------------------------------------------------
 		//publicÉÅÉìÉoä÷êî

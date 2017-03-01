@@ -19,6 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\Library\Resource\Mesh\PMX\PMX.h" />
+    <ClInclude Include="Sources\Library\Resource\Mesh\PMX\PMXLoader\PMXLoader.h" />
+    <ClInclude Include="Sources\Library\Graphics\D3D9\GraphicDeviceD3D9\GraphicDeviceD3D9.h" />
     <ClInclude Include="Sources\Library\Graphics\D3D11\BufferD3D11\BufferD3D11.h" />
     <ClInclude Include="Sources\Library\Graphics\D3D11\GraphicContextD3D11\GraphicContextD3D11.h" />
     <ClInclude Include="Sources\Library\Graphics\D3D11\GraphicDeviceD3D11\GraphicDeviceD3D11.h" />
@@ -28,7 +31,10 @@
     <ClInclude Include="Sources\Library\Graphics\GraphicDevice\IGraphicDevice.h" />
     <ClInclude Include="Sources\Library\Graphics\UsingGraphics\UsingGraphics.h" />
     <ClInclude Include="Sources\Library\Utility\COMPointer.h" />
+    <ClInclude Include="Sources\Library\Utility\Detachable.h" />
     <ClInclude Include="Sources\Library\Utility\NonCopyable.h" />
+    <ClInclude Include="Sources\Library\Utility\WString.h" />
+    <ClInclude Include="Sources\PMXMesh.h" />
     <ClInclude Include="Sources\TestApplication\D3D11Window\D3D11Window.h" />
     <ClInclude Include="Sources\TestApplication\D3D11Application\D3D11Application.h" />
     <ClInclude Include="Sources\Library\Utility\CommenTemplate\CommentTemplate.h" />
@@ -38,6 +44,8 @@
     <ClInclude Include="Sources\TestApplication\TestShader\TestShaderD3D11.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\Library\Resource\Mesh\PMX\PMXLoader\PMXLoader.cpp" />
+    <ClCompile Include="Sources\Library\Graphics\D3D9\GraphicDeviceD3D9\GraphicDeviceD3D9.cpp" />
     <ClCompile Include="Sources\Library\Graphics\D3D11\BufferD3D11\BufferD3D11.cpp" />
     <ClCompile Include="Sources\Library\Graphics\D3D11\GraphicContextD3D11\GraphicContextD3D11.cpp" />
     <ClCompile Include="Sources\Library\Graphics\D3D11\GraphicDeviceD3D11\GraphicDeviceD3D11.cpp" />
@@ -77,15 +85,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -118,7 +126,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>

@@ -10,6 +10,7 @@ namespace graphics
 	{
 		class BufferD3D11
 		{
+		public:
 			BufferD3D11(
 				ID3D11Device*						pDevice,
 				std::weak_ptr<ID3D11DeviceContext>	pDeviceContext,

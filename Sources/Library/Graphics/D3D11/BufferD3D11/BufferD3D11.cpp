@@ -58,18 +58,11 @@ namespace graphics
 
 			ID3D11Buffer* pBuffer = nullptr;
 
-			try
-			{
-				HRESULT hr = _pDevice->CreateBuffer(&bufferDesc, pInitialData, &pBuffer);
+			HRESULT hr = _pDevice->CreateBuffer(&bufferDesc, pInitialData, &pBuffer);
 
-				if (FAILED(hr))
-				{
-					throw utility::Exeption("BufferD3D11", "CreateBuffer", "failed ID3D11Device::CreateBuffer");
-				}
-			}
-			catch (utility::Exeption exeption)
+			if (FAILED(hr))
 			{
-				throw exeption;
+				throw std::runtime_error("Failed to ID3D11Device::CreateBuffer");
 			}
 
 			return pBuffer;

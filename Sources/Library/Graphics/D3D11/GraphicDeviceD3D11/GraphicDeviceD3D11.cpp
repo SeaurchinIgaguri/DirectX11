@@ -99,8 +99,8 @@ namespace graphics
 				{
 					if (0 < Quality)
 					{
-						dxgiSampleDesc_.Count	= i;
-						dxgiSampleDesc_.Quality	= Quality - 1;
+						multiSampleQuality_.Count	= i;
+						multiSampleQuality_.Quality	= Quality - 1;
 					}
 				}
 			}
@@ -108,17 +108,18 @@ namespace graphics
 
 		IDXGISwapChain* GraphicDeviceD3D11::CreateIDXGISwapChain(
 			HWND _hWnd,
-			bool _isWindowMode)
+			bool _isWindowMode,
+			bool _isMSAA)
 		{
 			HRESULT hr						= S_OK;
 			IDXGISwapChain* pDXGISwapChain	= nullptr;
 
 			// ウィンドウサイズを取得
-			RECT rc;
+			RECT clientRect;
 
-			GetClientRect(_hWnd, &rc);
-			UINT width	= rc.right	- rc.left;
-			UINT height = rc.bottom - rc.top;
+			GetClientRect(_hWnd, &clientRect);
+			UINT width	= clientRect.right	- clientRect.left;
+			UINT height = clientRect.bottom	- clientRect.top;
 
 			// スワップチェインの設定
 			DXGI_SWAP_CHAIN_DESC sd;
@@ -133,8 +134,10 @@ namespace graphics
 			sd.OutputWindow							= _hWnd;
 			sd.SampleDesc.Count						= 1;
 			sd.SampleDesc.Quality					= 0;
-			sd.SampleDesc							= dxgiSampleDesc_;
 			sd.Windowed								= _isWindowMode;
+
+			if(_isMSAA)
+				sd.SampleDesc = multiSampleQuality_;
 
 			try
 			{
@@ -200,6 +203,119 @@ namespace graphics
 			
 			return pRenderTargetView;
 		}
+
+		ID3D11DepthStencilView * GraphicDeviceD3D11::CreateID3D11DepthStencilView(
+			UINT _width,
+			UINT _height,
+			DXGI_FORMAT _textureFormat,
+			DXGI_FORMAT _viewFormat,
+			D3D11_DSV_DIMENSION _d3d11DSVdimension,
+			bool _isShaderResource,
+			bool _isMSAA)
+		{
+			D3D11_TEXTURE2D_DESC depthStencilTextureDesc;
+
+			ZeroMemory(&depthStencilTextureDesc, sizeof(depthStencilTextureDesc));
+
+			depthStencilTextureDesc.Width				= _width;
+			depthStencilTextureDesc.Height				= _height;
+			depthStencilTextureDesc.MipLevels			= 1;
+			depthStencilTextureDesc.ArraySize			= 1;
+			depthStencilTextureDesc.Format				= _textureFormat;
+			depthStencilTextureDesc.SampleDesc.Count	= 1;
+			depthStencilTextureDesc.SampleDesc.Quality	= 0;
+			depthStencilTextureDesc.Usage				= D3D11_USAGE_DEFAULT;
+			depthStencilTextureDesc.BindFlags			= D3D11_BIND_DEPTH_STENCIL;
+			depthStencilTextureDesc.CPUAccessFlags		= 0;
+			depthStencilTextureDesc.MiscFlags			= 0;
+
+			if (_isShaderResource)
+			{
+				depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+			}
+
+			if (_isMSAA)
+			{
+				depthStencilTextureDesc.SampleDesc = multiSampleQuality_;
+			}
+
+			ID3D11Texture2D* pDepthStencilTexture2D;
+
+			auto hr = pDevice_->CreateTexture2D(&depthStencilTextureDesc, nullptr, &pDepthStencilTexture2D);
+
+			if (FAILED(hr))
+			{
+				throw std::runtime_error("Failed to CreateTexture2D");
+			}
+
+			ID3D11DepthStencilView* pID3D11DepthStencilView = nullptr;
+
+			D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+
+			ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
+
+			depthStencilViewDesc.Format = _viewFormat;
+			depthStencilViewDesc.ViewDimension = _d3d11DSVdimension;
+			//depthStencilViewDesc.Texture2D.MipSlice = 1;
+
+			if (_d3d11DSVdimension == D3D11_DSV_DIMENSION_TEXTURE2D)
+				depthStencilViewDesc.Texture2D.MipSlice = 0;
+
+			//d3d11DepthStencilViewDesc.Format = _dxgiFormat;
+			//d3d11DepthStencilViewDesc.ViewDimension = _d3d11DSVdimension;
+
+			//if (_d3d11DSVdimension == D3D11_DSV_DIMENSION_TEXTURE2D)
+			//	d3d11DepthStencilViewDesc.Texture2D.MipSlice = 0;
+
+			hr = pDevice_->CreateDepthStencilView(pDepthStencilTexture2D, &depthStencilViewDesc, &pID3D11DepthStencilView);
+
+			pDepthStencilTexture2D->Release();
+			pDepthStencilTexture2D = nullptr;
+
+			if (FAILED(hr))
+			{
+				throw std::runtime_error("Failed to CreateDepthStencilView");
+			}
+
+			return pID3D11DepthStencilView;
+		}
+
+		ID3D11DepthStencilState * GraphicDeviceD3D11::CreateID3D11DepthStencilState()
+		{
+			ID3D11DepthStencilState* pID3D11DepthStencilState = nullptr;
+
+			D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+
+			depthStencilDesc.DepthEnable	= true;
+			depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			depthStencilDesc.DepthFunc		= D3D11_COMPARISON_LESS;
+			depthStencilDesc.StencilEnable	= false;
+
+			auto hr = pDevice_->CreateDepthStencilState(&depthStencilDesc, &pID3D11DepthStencilState);
+
+			if (hr)
+			{
+				throw std::runtime_error("Failed to CreateDepthStencilState");
+			}
+
+			return pID3D11DepthStencilState;
+		}
+
+		/*ID3D11DepthStencilState * GraphicDeviceD3D11::CreateID3D11DepthStencilState(
+			bool					_depthEnable, 
+			D3D11_DEPTH_WRITE_MASK	_depthWriteMask, 
+			D3D11_COMPARISON_FUNC	_depthFunc, 
+			bool					_stencilEnable)
+		{
+			ID3D11DepthStencilState* pID3D11DepthStencilState = nullptr;
+
+			D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+
+			depthStencilDesc.DepthEnable = _depthEnable;
+			depthStencilDesc.DepthFunc = _depthWriteMask
+
+			return pID3D11DepthStencilState;
+		}*/
 
 		ID3D11Texture2D * GraphicDeviceD3D11::CreateID3D11Texture2D(
 			UINT							_width, 

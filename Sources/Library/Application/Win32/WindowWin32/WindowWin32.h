@@ -120,6 +120,24 @@ namespace application
 				return hWnd_;
 			}
 
+			UINT GetClientWidth()
+			{
+				RECT clientRect;
+
+				GetClientRect(hWnd_, &clientRect);
+
+				return clientRect.right - clientRect.left;
+			}
+
+			UINT GetClientHeight()
+			{
+				RECT clientRect;
+
+				GetClientRect(hWnd_, &clientRect);
+
+				return  clientRect.bottom - clientRect.top;
+			}
+
 		private:
 			void _CreateWindow(
 				ApplicationWin32&	_applicationWin32,
