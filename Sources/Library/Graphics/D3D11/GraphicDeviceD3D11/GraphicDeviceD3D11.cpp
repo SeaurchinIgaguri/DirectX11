@@ -90,20 +90,6 @@ namespace graphics
 			pDXGIAdapter_	= std::shared_ptr<IDXGIAdapter>(pDXGIAdapter, utility::ComDeleter());
 			pDXGIFactory_	= std::shared_ptr<IDXGIFactory>(pDXGIFactory, utility::ComDeleter());
 
-			// 現環境で使用できるMSAAをチェック
-			for (int i = 1; i <= D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; i <<= 1)
-			{
-				UINT Quality;
-
-				if (SUCCEEDED(pDevice_->CheckMultisampleQualityLevels(DXGI_FORMAT_D24_UNORM_S8_UINT, i, &Quality)))
-				{
-					if (0 < Quality)
-					{
-						multiSampleQuality_.Count	= i;
-						multiSampleQuality_.Quality	= Quality - 1;
-					}
-				}
-			}
 		}	// GraphicDeviceD3D11
 
 		IDXGISwapChain* GraphicDeviceD3D11::CreateIDXGISwapChain(
@@ -136,8 +122,23 @@ namespace graphics
 			sd.SampleDesc.Quality					= 0;
 			sd.Windowed								= _isWindowMode;
 
-			if(_isMSAA)
-				sd.SampleDesc = multiSampleQuality_;
+			if (_isMSAA)
+			{
+				// 現環境で使用できるMSAAをチェック
+				for (int i = 1; i <= D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; i <<= 1)
+				{
+					UINT Quality;
+
+					if (SUCCEEDED(pDevice_->CheckMultisampleQualityLevels(DXGI_FORMAT_D24_UNORM_S8_UINT, i, &Quality)))
+					{
+						if (0 < Quality)
+						{
+							sd.SampleDesc.Count		= i;
+							sd.SampleDesc.Quality	= Quality - 1;
+						}
+					}
+				}
+			}
 
 			try
 			{
