@@ -1,7 +1,9 @@
 #pragma once
 
 #include <d3d11.h>
-#pragma comment(lib,"d3d11.lib")
+#pragma comment(lib, "dxgi.lib")			// リンク対象ライブラリにdxgi.libを追加
+#pragma comment(lib, "d3d11.lib")			// リンク対象ライブラリにd3d11.libを追加
+#pragma comment(lib, "winmm.lib")			// リンク対象ライブラリにwinmm.libを追加
 
 #include <array>
 #include <vector>
@@ -92,7 +94,7 @@ namespace graphics
 		};	// GraphicDeviceD3D11
 
 		template<std::size_t arraySize>
-		inline ID3D11InputLayout * GraphicDeviceD3D11::CreateID3D11InputLayout(const std::array<D3D11_INPUT_ELEMENT_DESC, arraySize>& inputElements, const ShaderBinaryCode & shaderBinaryCode)
+		ID3D11InputLayout * GraphicDeviceD3D11::CreateID3D11InputLayout(const std::array<D3D11_INPUT_ELEMENT_DESC, arraySize>& inputElements, const ShaderBinaryCode & shaderBinaryCode)
 		{
 			ID3D11InputLayout* pID3D11InputLayout;
 

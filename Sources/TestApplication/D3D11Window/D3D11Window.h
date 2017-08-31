@@ -31,8 +31,9 @@ namespace d3d11application
 	public:
 		D3D11Window(
 			application::win32::ApplicationWin32&	_applicationWin32,
+			int										_nCmdShow,
 			application::WindowSetting				_windowSetting) 
-			: application::win32::WindowWin32(_applicationWin32, _windowSetting)
+			: application::win32::WindowWin32(_applicationWin32, _nCmdShow, _windowSetting)
 		{
 
 		}

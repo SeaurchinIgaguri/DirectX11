@@ -34,6 +34,26 @@ namespace utility
 		return dest;
 	}
 
+	inline std::string WStringToString(const std::wstring &src)
+	{
+		int returnValue;
+
+		char *pMBS = new char[src.length() * MB_CUR_MAX + 1];	// ソース元の文字列の長さ分char配列をnew
+
+		wcstombs_s(												// wchar_tからchar型に変換
+			(size_t*)&returnValue,
+			pMBS,
+			(size_t)src.length() * MB_CUR_MAX + 1,
+			src.c_str(),
+			_TRUNCATE);
+
+		std::string dest = pMBS;
+
+		delete[] pMBS;
+
+		return dest;
+	}
+
 	inline std::wstring ReadWStringUTF16(std::ifstream& _ifs)
 	{
 		int size = 0;

@@ -9,9 +9,10 @@ namespace resource
 {
 	namespace mesh
 	{
-		class PMX
+
+
+		namespace pmxformat
 		{
-		public:
 			// PMXのデータ構造
 #pragma pack(push, 1)		// アライメントをOFF
 			struct float2
@@ -67,16 +68,16 @@ namespace resource
 			};
 
 			// ウェイト情報ここから
-			enum SkiningType
+			enum class SkiningType
 			{
-				SKININGTYPE_BDEF1,
-				SKININGTYPE_BDEF2,
-				SKININGTYPE_BDEF4,
-				SKININGTYPE_SDEF,
+				BDEF1,
+				BDEF2,
+				BDEF4,
+				SDEF,
 			};
 
 			// ボーンのみ インデックスのバイト数は可変だがずぼらしてint固定
-			class IVertexSkining
+			struct IVertexSkining
 			{
 			public:
 				virtual void Read(std::ifstream& _ifs, unsigned char _boneIndexSize) = 0;
@@ -94,7 +95,7 @@ namespace resource
 			};
 
 			// ボーン2つと、ボーン1のウェイト値(PMD方式)
-			class BDEF2 : public IVertexSkining
+			struct BDEF2 : public IVertexSkining
 			{
 			public:
 				int		index1;		//!< ボーン1
@@ -110,7 +111,7 @@ namespace resource
 			};
 
 			// ボーン4つと、それぞれのウェイト値。ウェイト合計が1.0である保障はしない
-			class BDEF4 : public IVertexSkining
+			struct BDEF4 : public IVertexSkining
 			{
 			public:
 				int		index1;
@@ -136,7 +137,7 @@ namespace resource
 			};
 
 			// BDEF2に加え、SDEF用のfloat3(Vector3)が3つ。実際の計算ではさらに補正値の算出が必要(一応そのままBDEF2としても使用可能)
-			class SDEF : public IVertexSkining
+			struct SDEF : public IVertexSkining
 			{
 			public:
 				int		index1;		//!< ボーン1

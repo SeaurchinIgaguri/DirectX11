@@ -125,7 +125,7 @@
     <ClInclude Include="Sources\Library\Resource\Mesh\PMX\PMXLoader\PMXLoader.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Library\Resource\Mesh\PMX\PMX.h">
+    <ClInclude Include="Sources\Library\Resource\Mesh\PMX\PMXFormat.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

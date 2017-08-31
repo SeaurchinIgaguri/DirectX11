@@ -123,7 +123,6 @@ namespace application
 			UINT GetClientWidth()
 			{
 				RECT clientRect;
-
 				GetClientRect(hWnd_, &clientRect);
 
 				return clientRect.right - clientRect.left;
@@ -132,7 +131,6 @@ namespace application
 			UINT GetClientHeight()
 			{
 				RECT clientRect;
-
 				GetClientRect(hWnd_, &clientRect);
 
 				return  clientRect.bottom - clientRect.top;

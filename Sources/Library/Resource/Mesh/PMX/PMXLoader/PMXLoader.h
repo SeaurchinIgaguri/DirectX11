@@ -1,65 +1,47 @@
 #pragma once
 
-#include "../PMX.h"
+#include "../PMXFormat.h"
+
+// 前方宣言
+//class PMXFormat;
 
 namespace resource
 {
 	namespace mesh
 	{
-		class PMXLoader
+		class PMX
 		{
 		public:
-			void Open(const std::string& filePath);
-			void Close();
 
-			void LoadHeader();
-			void LoadModelData();
-			void LoadVertices();
-			void LoadIndices();
-			void LoadTexturePaths();
-			void LoadMaterials();
-			void LoadBone();
-			void LoadMofe();
-
-			PMX& GetPMXData();
-			void GetVertices();
-			void GetIndices();
-			void GetTexturePaths();
-			void GetMaterials();
-
-		private:
-			bool isOpend_;
-			bool isLoadedHeader_;
-			bool isLoadedModelData_;
-			bool isLoadedVertices_;
-			bool isLoadedIndices_;
-			bool isLoadedTexturePaths_;
-			bool isLoadedMaterials_;
-			bool isLoadedBone_;
-			bool isLoadedMofe_;
-
-			PMX pmxData_;
-		};
-
-		class PMXConverter
-		{
-			
+			//std::string	meshFilePath_;	//!< ファイルパス
+			pmxformat::Header					header;			//!< ヘッダ情報
+			pmxformat::ModelInfo				modelInfo;		//!< モデル情報
+			int									vertexCount;	//!< 頂点数
+			std::vector<pmxformat::VertexData>	vertices;		//!< 頂点配列
+			//int								indexCount;		//!< インデックス数
+			std::vector<int>					indices;		//!< インデックス配列
+			//int								textureCount;	//!< テクスチャ数
+			std::vector<std::string>			textureNames;	//!< テクスチャ配列
+			//int								materialCount;	//!< マテリアル数
+			std::vector<pmxformat::Material>	materials;		//!< マテリアル配列
+			int									boneCount;		//!< ボーン数
+			std::vector<pmxformat::Bone>		bones;			//!< ボーン排列
 		};
 
 		namespace pmxloader 
 		{
 
-			PMX::Header	LoadHeader(std::ifstream pmxStream);
-			
-			PMX::ModelInfo LoadModelInfo(std::ifstream pmxStream);
+			PMX* Load(const std::string& pmxFilePath);
 
-			std::vector<PMX::VertexData> LoadVertices(std::ifstream pmxStream, const PMX::Header& pmxHeader);
+			resource::mesh::pmxformat::ModelInfo LoadModelInfo(std::ifstream & _ifStreamPMX);
 
-			std::vector<int> LoadIndices(std::ifstream pmxStream, const PMX::Header& pmxHeader);
+			std::vector<resource::mesh::pmxformat::VertexData> LoadVertices(std::ifstream & _ifStreamPMX, const resource::mesh::pmxformat::Header & _header);
 
-			std::vector<std::string> LoadTexturePaths(std::ifstream pmxStream, const PMX::Header& pmxHeader);
+			std::vector<int> LoadIndices(std::ifstream & _ifStreamPMX, const resource::mesh::pmxformat::Header & _header);
 
-			std::vector<PMX::Material> LoadMaterial(std::ifstream& pmxStream, const PMX::Header& pmxHeader);
+			std::vector<std::string> LoadTextureNames(std::ifstream & _ifStreamPMX);
+
+			std::vector<resource::mesh::pmxformat::Material> LoadMaterials(std::ifstream & _ifStreamPMX, const resource::mesh::pmxformat::Header & _header);
 
 		}		// end of namespace pmxloader
 	}

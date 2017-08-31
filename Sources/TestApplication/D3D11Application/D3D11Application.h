@@ -40,13 +40,13 @@ namespace d3d11application
 
 		D3D11Window d3d11Window_;
 
-		graphics::d3d11::GraphicDeviceD3D11		graphicDevice_;
-		graphics::d3d11::GraphicContextD3D11	graphicContext_;
+		std::unique_ptr<graphics::d3d11::GraphicDeviceD3D11> 	pGraphicDevice_;
+		std::unique_ptr<graphics::d3d11::GraphicContextD3D11>	pGraphicContext_;
 
 		utility::com_unique_ptr<IDXGISwapChain>				pSwapChain_;
 		utility::com_unique_ptr<ID3D11RenderTargetView>		pRenderTargetView_;
 
-		TestShaderD3D11									testShader_;
+		std::unique_ptr<TestShaderD3D11>				pTestShader_;
 		std::unique_ptr<graphics::d3d11::BufferD3D11>	pTestVertexBuffer;
 
 		/*------------------------------------------------------------------------
@@ -78,10 +78,3 @@ namespace d3d11application
 
 	};		// D3D11Application
 }		// d3d11application
-
-
-/*------------------------------------------------------------------------
-その他使うもの
-@tparam		テンプレート型名	テンプレートの説明
-@todo		やらなければいけない事の説明
-------------------------------------------------------------------------*/

@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sources\Library\Resource\Mesh\PMX\PMX.h" />
+    <ClInclude Include="Sources\Library\Resource\Mesh\PMX\PMXFormat.h" />
     <ClInclude Include="Sources\Library\Resource\Mesh\PMX\PMXLoader\PMXLoader.h" />
     <ClInclude Include="Sources\Library\Graphics\D3D9\GraphicDeviceD3D9\GraphicDeviceD3D9.h" />
     <ClInclude Include="Sources\Library\Graphics\D3D11\BufferD3D11\BufferD3D11.h" />
@@ -80,6 +80,7 @@
     <ProjectGuid>{86F78106-FECA-4379-B4A4-AA8579E1F301}</ProjectGuid>
     <RootNamespace>MyProject</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>DirectX11</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

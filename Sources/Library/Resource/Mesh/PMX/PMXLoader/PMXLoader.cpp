@@ -1,94 +1,186 @@
 #include "PMXLoader.h"
+
 #include "../../../../Utility/WString.h"
 
 namespace resource
 {
 	namespace mesh
 	{
-		void PMXLoader::Open(const std::string& _filePath)
-		{
-			std::ifstream	ifs(_filePath, std::ios::binary);
-
-			if (ifs.fail())
-			{
-				throw std::runtime_error("failed open pmx file");
-			}
-
-			isOpend_ = true;
-		}
-
 		namespace pmxloader
 		{
-			namespace
-			{
-				std::streamoff StreamOffsetModelInfo()
-				{
-					return sizeof(PMX::Header);
-				}
-
-				std::streamoff StreamOffsetVertices(const PMX::ModelInfo& modelInfo)
-				{
-					auto streamOffsetModelInfo = StreamOffsetModelInfo();
-
-					return streamOffsetModelInfo + modelInfo.GetLength();
-				}
-
-				std::streamoff StreamOffsetIndices(const PMX::ModelInfo& modelInfo, const int vertexCount)
-				{
-					auto streamOffsetVertices = StreamOffsetVertices(modelInfo);
-
-					//std::size_t vertexSize = sizeof(PMX::float3) + sizeof(PMX::float3) + sizeof(PMX::float2)
-				}
-			}
-
-			PMX::Header LoadHeader(std::ifstream pmxStream)
-			{
-				PMX::Header pmxHeader;
-
-				/*if (pmxStream.fail())
-				{
-					throw std::runtime_error("not opend pmxStream");
-				}*/
-
-				pmxStream.seekg(0, std::ios_base::beg);
-
-				pmxStream.read((char*)&pmxHeader, sizeof(pmxHeader));
-
-				return pmxHeader;
-			}
-
-			PMX::ModelInfo LoadModelInfo(std::ifstream pmxStream)
+			PMX* Load(const std::string& _pmxFilePath)
 			{
 				using namespace utility;
 
-				PMX::ModelInfo pmxModelInfo;
+				PMX* pPMX = new PMX;
 
-				std::streamoff streamOffModelInfo = sizeof(PMX::Header);
+				std::ifstream ifStreamPMX(_pmxFilePath, std::ios::binary);
 
-				pmxStream.seekg(streamOffModelInfo, std::ios_base::beg);
+				if (ifStreamPMX.fail())
+				{
+					throw std::exception("failed open pmx file");
+				}
 
-				pmxModelInfo.modelName			= ReadWStringUTF16(pmxStream);
-				pmxModelInfo.modelNameEnglish	= ReadWStringUTF16(pmxStream);
-				pmxModelInfo.comment			= ReadWStringUTF16(pmxStream);
-				pmxModelInfo.commentEnglish		= ReadWStringUTF16(pmxStream);
+				// load header
+				ifStreamPMX.read((char*)&pPMX->header, sizeof(pmxformat::Header));
 
-				return pmxModelInfo;
+				// load modelinfo
+				pPMX->modelInfo = LoadModelInfo(ifStreamPMX);
+
+				pPMX->vertices = LoadVertices(ifStreamPMX, pPMX->header);
+
+				return pPMX;
 			}
 
-			std::vector<PMX::VertexData> LoadVertices(std::ifstream pmxStream, const PMX::Header& pmxHeader)
+
+
+			resource::mesh::pmxformat::ModelInfo LoadModelInfo(std::ifstream& _ifStreamPMX)
 			{
-				std::vector<PMX::VertexData> vertices;
+				using namespace utility;
 
-				//auto streamOffszetVertices = StreamOffsetVertices(modelInfo);
+				resource::mesh::pmxformat::ModelInfo modelInfo;
 
-				int vertexCount = 0;
+				modelInfo.modelName			= ReadWStringUTF16(_ifStreamPMX);
+				modelInfo.modelNameEnglish	= ReadWStringUTF16(_ifStreamPMX);
+				modelInfo.comment			= ReadWStringUTF16(_ifStreamPMX);
+				modelInfo.commentEnglish	= ReadWStringUTF16(_ifStreamPMX);
 
-				
+				return modelInfo;
+			}
+
+			std::vector<resource::mesh::pmxformat::VertexData> LoadVertices(std::ifstream& _ifStreamPMX, const resource::mesh::pmxformat::Header& _header)
+			{
+				using namespace resource::mesh;
+
+				int verticesSize;
+
+				_ifStreamPMX.read((char*)&verticesSize, sizeof(int));
+
+				std::vector<resource::mesh::pmxformat::VertexData> vertices(verticesSize);
+
+				for (int i = 0; i < verticesSize; ++i)
+				{
+					_ifStreamPMX.read((char*)&vertices[i].position, sizeof(pmxformat::float3));
+					_ifStreamPMX.read((char*)&vertices[i].normal, sizeof(pmxformat::float3));
+					_ifStreamPMX.read((char*)&vertices[i].uv, sizeof(pmxformat::float2));
+
+					auto numAddUV = _header.data[pmxformat::ByteDataDatail::ADD_UV_NUM];
+
+					if (numAddUV > 0)
+					{
+						vertices[i].pAddUV.reset(new pmxformat::float4);
+
+						for (int j = 0; j < numAddUV; ++j)
+						{
+							_ifStreamPMX.read((char*)&vertices[i].pAddUV, sizeof(pmxformat::float4));
+						}
+					}
+
+					_ifStreamPMX.read((char*)&vertices[i].skiningType, sizeof(vertices[i].skiningType));
+
+					switch (static_cast<pmxformat::SkiningType>(vertices[i].skiningType))
+					{
+					case pmxformat::SkiningType::BDEF1:
+						vertices[i].pSkining.reset(new pmxformat::BDEF1);
+						break;
+
+					case pmxformat::SkiningType::BDEF2:
+						vertices[i].pSkining.reset(new pmxformat::BDEF2);
+						break;
+
+					case pmxformat::SkiningType::BDEF4:
+						vertices[i].pSkining.reset(new pmxformat::BDEF4);
+						break;
+
+					case pmxformat::SkiningType::SDEF:
+						vertices[i].pSkining.reset(new pmxformat::SDEF);
+						break;
+
+					default:
+						break;
+					}
+
+					if (vertices[i].pSkining)
+						vertices[i].pSkining->Read(_ifStreamPMX, _header.data[pmxformat::BONE_INDEX_SIZE]);
+
+					_ifStreamPMX.read((char*)&vertices[i].edgeMagnification, sizeof(vertices[i].edgeMagnification));
+				}
 
 				return vertices;
 			}
 
+			std::vector<int> LoadIndices(std::ifstream& _ifStreamPMX, const resource::mesh::pmxformat::Header& _header)
+			{
+				using namespace resource::mesh;
 
+				int indicesSize = 0;
+
+				_ifStreamPMX.read((char*)indicesSize, sizeof(int));
+
+				std::vector<int> indices(indicesSize);
+
+				_ifStreamPMX.read((char*)&indices[0], _header.data[pmxformat::ByteDataDatail::VERTEX_INDEX_SIZE] * indicesSize);
+
+				return indices;
+			}
+
+			std::vector<std::string> LoadTextureNames(std::ifstream& _ifStreamPMX)
+			{
+				using namespace utility;
+
+				int textureNamesSize = 0;
+
+				_ifStreamPMX.read((char*)textureNamesSize, sizeof(int));
+
+				std::vector<std::string> textureNames(textureNamesSize);
+
+				for (auto& textureName : textureNames)
+				{
+					textureName = WStringToString(ReadWStringUTF16(_ifStreamPMX));
+				}
+
+				return textureNames;
+			}
+
+			std::vector<resource::mesh::pmxformat::Material> LoadMaterials(std::ifstream& _ifStreamPMX, const resource::mesh::pmxformat::Header& _header)
+			{
+				using namespace utility;
+				using namespace resource::mesh::pmxformat;
+
+				int materialsSize = 0;
+
+				_ifStreamPMX.read((char*)materialsSize, sizeof(int));
+
+				std::vector<Material> materials(materialsSize);
+
+				for (auto& material : materials)
+				{
+					material.name			= ReadWStringUTF16(_ifStreamPMX);
+					material.nameEnglish	= ReadWStringUTF16(_ifStreamPMX);
+
+					_ifStreamPMX.read((char*)&material.diffuse,				sizeof(float4));
+					_ifStreamPMX.read((char*)&material.specular,			sizeof(float3));
+					_ifStreamPMX.read((char*)&material.specularPower,		sizeof(float));
+					_ifStreamPMX.read((char*)&material.ambient,				sizeof(float3));
+					_ifStreamPMX.read((char*)&material.drawFlg,				sizeof(char));
+					_ifStreamPMX.read((char*)&material.edgeColor,			sizeof(float4));
+					_ifStreamPMX.read((char*)&material.edgeSize,			sizeof(float));
+					_ifStreamPMX.read((char*)&material.textureIndex,		_header.data[TEXTURE_INDEX_SIZE]);
+					_ifStreamPMX.read((char*)&material.sphereTextureIndex,	_header.data[TEXTURE_INDEX_SIZE]);
+					_ifStreamPMX.read((char*)&material.sphereMode,			sizeof(char));
+					_ifStreamPMX.read((char*)&material.shareToonFlg,		sizeof(char));
+
+					material.shareToonFlg == true ?  
+						_ifStreamPMX.read((char*)&material.toonTextureIndex, _header.data[TEXTURE_INDEX_SIZE]) :
+						_ifStreamPMX.read((char*)&material.shareToonTextureIndex, sizeof(char));
+
+					material.memo = ReadWStringUTF16(_ifStreamPMX);
+					
+					_ifStreamPMX.read((char*)&material.faceCount, sizeof(int));
+				}
+
+				return materials;
+			}
 		}
 	}
 }
